@@ -62,7 +62,8 @@ export class CategoryListPage implements OnInit {
 
     deleteCategory(category: Category) {    
       const dialogRef = this.dialog.open(DialogConfirmation, {
-        data: { title: "Eliminar categoría", description: "Atención si borra la categoría se perderán sus datos.<br> ¿Desea eliminar la categoría?" }
+        data: { title: "Eliminar categoría", 
+        description: "Atención si borra la categoría se perderán sus datos.<br> ¿Desea eliminar la categoría?" }
       });
 
       dialogRef.afterClosed().subscribe(result => {
