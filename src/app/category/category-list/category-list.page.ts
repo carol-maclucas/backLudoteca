@@ -29,13 +29,6 @@ export class CategoryListPage implements OnInit {
     //Inyeccion moderna
     protected readonly categoryService = inject(CategoryService);
     protected readonly dialog = inject(MatDialog);
-
-    // Instacia de CategoryService
-    constructor(
-      // Inyección clasica
-      //private categoryService: CategoryService,
-      //private dialog: MatDialog
-    ) { }
     
     // EDITAR CATEGORIA
     createCategory() {    
@@ -50,6 +43,7 @@ export class CategoryListPage implements OnInit {
         this.loadData();
       });
     } 
+    
     editCategory(category: Category) {
       const dialogRef = this.dialog.open(CategoryEdit, {
         data: { category }
