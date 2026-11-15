@@ -5,6 +5,19 @@ INSERT INTO category(name)
 VALUES ('Ameritrash');
 INSERT INTO category(name)
 VALUES ('Familiar');
+
+-- Client
+INSERT INTO client(name)
+VALUES ('Cliente 1');
+INSERT INTO client(name)
+VALUES ('Cliente 2');
+INSERT INTO client(name)
+VALUES ('Cliente 3');
+INSERT INTO client(name)
+VALUES ('Cliente 4');
+INSERT INTO client(name)
+VALUES ('Cliente 5');
+
 -- Author
 INSERT INTO author(name, nationality)
 VALUES ('Alan R. Moon', 'US');
