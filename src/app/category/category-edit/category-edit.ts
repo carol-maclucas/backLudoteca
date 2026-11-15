@@ -19,9 +19,9 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './category-edit.scss',
   templateUrl: './category-edit.html',
 })
-export class CategoryEditComponent implements OnInit {
+export class CategoryEdit implements OnInit {
   // Inyección
-  protected readonly dialogRef = inject(MatDialogRef<CategoryEditComponent>);
+  protected readonly dialogRef = inject(MatDialogRef<CategoryEdit>);
   protected readonly data = inject(MAT_DIALOG_DATA) as { category: Category };
   protected readonly categoryService = inject(CategoryService);
 
