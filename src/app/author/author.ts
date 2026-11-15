@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { Pageable } from '../core/model/page/Pageable';
 import { Author } from './model/Author';
 import { PaginatedData } from '../core/model/page/PaginatedData';
-import { AUTHOR_DATA } from './model/mock-authors';
+//import { AUTHOR_DATA } from './model/mock-authors';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
