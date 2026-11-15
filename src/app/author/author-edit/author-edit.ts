@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-//import { validateFields } from '../../core/helpers/validation'
+import { validateFields } from '../../core/helpers/validation'
 
 @Component({
     selector: 'app-author-edit',
@@ -46,8 +46,8 @@ export class AuthorEdit implements OnInit {
     const data = { name, nationality }
 
     // Validar campos requeridos
-    if (requiredFields.some((field) => !data[field]?.trim())) {
-      return;
+    if (!validateFields(data, requiredFields)) {
+        return;
     }
 
     const author = {id,name,nationality} as Author;
