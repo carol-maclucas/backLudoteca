@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ClientsService } from '../clients';
 import { Clients } from "../model/Clients";
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,6 +28,9 @@ export class ClientsEdit implements OnInit {
 
   protected readonly id = signal<number | null>(null);
   protected readonly name = signal<string | null>(null);
+  protected readonly nameError = signal<string | null>(null);
+
+  @ViewChild('nameControl') private nameControl?: NgModel;
 
   // Al iniciar, se cargan los datos del formulario
   ngOnInit(): void {
@@ -50,9 +53,19 @@ export class ClientsEdit implements OnInit {
 
     const client = { id, name } as Clients;
     
-    this.clientsService.saveClient(client).subscribe(() => {
-    this.dialogRef.close(true);
+    this.clientsService.saveClient(client).subscribe({
+      next: () => this.dialogRef.close(true),
+      error: () => {
+        this.nameError.set('El nombre ya existe, pruebe otro.');
+        this.nameControl?.control.setErrors({ server: true });
+        this.nameControl?.control.markAsTouched();
+      }
     });
+  }
+
+  onNameChange(): void {
+    this.nameError.set(null);
+    this.nameControl?.control.updateValueAndValidity();
   }
   
   onClose() {
