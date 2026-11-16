@@ -22,6 +22,13 @@ public interface ClientService {
     List<Client> findAll();
 
     /**
+     * Método para el nombre de un {@link Client}
+     *
+     * @return {@link List} de {@link Client}
+     */
+    Client findByName(String name);
+
+    /**
      * Método para crear o actualizar una {@link Client}
      *
      * @param id  PK de la entidad

@@ -34,6 +34,14 @@ public class ClientServiceImpl implements ClientService {
      * {@inheritDoc}
      */
     @Override
+    public Client findByName(String name) {
+        return this.clientRepository.findByName(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void save(Long id, ClientDto dto) {
         Client client;
         if (id == null) {
@@ -43,6 +51,15 @@ public class ClientServiceImpl implements ClientService {
 
             if (client == null) {
                 throw new RuntimeException("Client not found");
+            }
+        }
+        Client existedClient = this.clientRepository.findByName(dto.getName());
+        if (existedClient != null) {
+            // Si estamos creando uno nuevo pero, el nombre ya existe
+            // Si le cambio el nombre a un cliente con uno que ya existe en la BBDD
+            // porque Id:3 Clara != Id:8 Clara
+            if (id == null || !existedClient.getId().equals(id)) {
+                throw new RuntimeException("Client already exists");
             }
         }
         client.setName(dto.getName());

@@ -40,7 +40,7 @@ public class ClientTest {
         assertEquals(1, clients.size());
     }
 
-    //-------------- CREACIÓN de CLIENT ------------
+    //-------------- CREACIÓN de CLIENTE ------------
     public static final String CLIENT_NAME = "Cliente_1";
 
     @Test
@@ -58,6 +58,24 @@ public class ClientTest {
         assertEquals(CLIENT_NAME, client.getValue().getName());
     }
 
+    // -- Evitando nombres duplicados --
+    public static final String CLIENT_NAME_DUPLICATED = "Cliente_1";
+
+    @Test
+    public void saveNotExistsClientAndExistsNameShouldNotInsert() {
+        ClientDto clientDto = new ClientDto();
+        clientDto.setName(CLIENT_NAME_DUPLICATED);
+
+        // Objeto falso
+        Client existingClient = mock(Client.class);
+        existingClient.setName(clientDto.getName());
+
+        when(clientRepository.findByName(CLIENT_NAME_DUPLICATED)).thenReturn(existingClient);
+        assertThrows(RuntimeException.class, () -> {
+            clientService.save(null, clientDto);
+        });
+    }
+
     //-------------- MODIFICACIÓN de CLIENTES ------------
     public static final Long EXISTS_CLIENT_ID = 1L;
 
@@ -73,6 +91,30 @@ public class ClientTest {
 
         clientService.save(EXISTS_CLIENT_ID, clientDto);
         verify(clientRepository).save(client);
+    }
+
+    // -- Evitando nombres duplicados --
+    public static final Long EXISTS_CLIENT_ID_2 = 2L;
+
+    @Test
+    public void saveExistsNameShouldNotUpdate() {
+        ClientDto clientDto = new ClientDto();
+        clientDto.setName(CLIENT_NAME_DUPLICATED);
+
+        Client clientUpdate = mock(Client.class);
+        clientUpdate.setId(EXISTS_CLIENT_ID);
+        clientUpdate.setName(CLIENT_NAME);
+        when(clientRepository.findById(EXISTS_CLIENT_ID)).thenReturn(Optional.of(clientUpdate));
+
+        Client existedClient = mock(Client.class);
+
+        existedClient.setId(EXISTS_CLIENT_ID_2);
+        existedClient.setName(CLIENT_NAME_DUPLICATED);
+        when(clientRepository.findByName(CLIENT_NAME_DUPLICATED)).thenReturn(existedClient);
+
+        assertThrows(RuntimeException.class, () -> {
+            clientService.save(EXISTS_CLIENT_ID, clientDto);
+        });
     }
 
     //-------------- ELIMINACIÓN de CLIENTES ------------

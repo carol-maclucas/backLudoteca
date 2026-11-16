@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ClientIT {
     // GET del ENDPOINT:
     public static final String LOCALHOST = "http://localhost:";
-    public static final String SERVICE_PATH = "/client";
+    public static final String SERVICE_PATH = "/clients";
 
     @LocalServerPort
     private int port;
@@ -42,8 +42,7 @@ public class ClientIT {
     @Test
     public void findAllShouldReturnAllClients() {
         // GET
-        ResponseEntity<List<ClientDto>> response = restTemplate
-                .exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseType);
         assertNotNull(response);
         assertEquals(5, response.getBody().size());
     }
@@ -65,6 +64,21 @@ public class ClientIT {
         ClientDto clientSearch = response.getBody().stream().filter(item -> item.getId().equals(NEW_CLIENT_ID)).findFirst().orElse(null);
         assertNotNull(clientSearch);
         assertEquals(NEW_CLIENT_NAME, clientSearch.getName());
+    }
+
+    // -- Evitando nombres duplicados --
+    public static final Long SECOND_CLIENT_ID = 9L;
+    public static final String DUPLICATED_NAME = "Cliente 2";
+
+    @Test
+    public void saveWithoutIdAndExistsNameShouldNotCreateNewClient() {
+        ClientDto dto = new ClientDto();
+        dto.setName(DUPLICATED_NAME);
+        // PUT
+        restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
+        ResponseEntity<List<ClientDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseType);
+
+        assertEquals(5, response.getBody().size());
     }
 
     //-------------- MODIFICACIÓN de CLIENTES ------------
@@ -92,6 +106,16 @@ public class ClientIT {
     public void modifyWithNotExistIdShouldInternalError() {
         ClientDto dto = new ClientDto();
         dto.setName(NEW_CLIENT_NAME);
+        // PUT
+        ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + NEW_CLIENT_ID, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    //Modificando un NOMBRE que ya existe
+    @Test
+    public void modifyWithExistsNameShouldInternalError() {
+        ClientDto dto = new ClientDto();
+        dto.setName(DUPLICATED_NAME);
         // PUT
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + NEW_CLIENT_ID, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
