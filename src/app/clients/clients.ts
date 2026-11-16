@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Clients } from './model/Clients';
 import { HttpClient } from '@angular/common/http';
-//import { CLIENTS_DATA } from "./model/mock-clients";
+import { CLIENTS_DATA } from './model/mock-clients';
 
 // Era mejor hacerlo todo con "Client" en singular pero para no romper el código 
 // ya existente, lo ha dejado como "Clients"
@@ -23,6 +23,10 @@ export class ClientsService {
         const {id} = client;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
         return this.http.put<Clients>(url, client);
+    }
+
+    getAllClients(): Observable<Clients[]> {
+        return of(CLIENTS_DATA);
     }
 
     deleteClient(idClient: number): Observable<any> {

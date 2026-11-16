@@ -48,9 +48,7 @@ export class GameListPage implements OnInit {
   ngOnInit(): void {
     this.gameService.getGames().subscribe((games) => this.games.set(games));
 
-    this.categoryService
-      .getCategories()
-      .subscribe((categories) => this.categories.set(categories));
+    this.categoryService.getCategories().subscribe((categories) => this.categories.set(categories));
     }
 
   // Limpiar los filtros y realizar la búsqueda
@@ -70,7 +68,7 @@ export class GameListPage implements OnInit {
       .subscribe((games) => this.games.set(games));
     }
 
-        createGame() {
+    createGame() {
         const dialogRef = this.dialog.open(GameEdit, {
             data: {},
         });

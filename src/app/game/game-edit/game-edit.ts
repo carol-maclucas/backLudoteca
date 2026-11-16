@@ -16,7 +16,8 @@ import { validateFields } from '../../core/helpers/validation'
 @Component({
   selector: 'app-game-edit',
   standalone: true,
-  imports: [FormsModule, 
+  imports: [
+    FormsModule, 
     ReactiveFormsModule, 
     MatFormFieldModule, 
     MatInputModule, 

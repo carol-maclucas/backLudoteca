@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Game } from './model/Game';
-//import { GAME_DATA } from './model/mock-games';
+import { GAME_DATA } from './model/mock-games';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -21,6 +21,10 @@ export class GameService {
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
 
         return this.http.put<void>(url, game);
+    }
+
+    getAllGames(): Observable<Game[]> {
+        return of(GAME_DATA);
     }
 
     private composeFindUrl(title?: string, categoryId?: number): string {
