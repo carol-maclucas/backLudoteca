@@ -18,6 +18,18 @@ VALUES ('Cliente 4');
 INSERT INTO client(name)
 VALUES ('Cliente 5');
 
+-- Loans --
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (1, 1, '2020-01-01', '2020-01-06');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES(2, 1, '2020-01-02', '2020-01-14');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (1, 1, '2020-01-07', '2020-01-14');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES(3, 2, '2020-01-01', '2020-01-09');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES(4, 3, '2020-01-01', '2020-01-10')
+
 -- Author
 INSERT INTO author(name, nationality)
 VALUES ('Alan R. Moon', 'US');
@@ -31,7 +43,8 @@ INSERT INTO author(name, nationality)
 VALUES ('Michael Kiesling', 'DE');
 INSERT INTO author(name, nationality)
 VALUES ('Phil Walker-Harding', 'US');
--- Juegos
+
+-- Games
 INSERT INTO game(title, age, category_id, author_id)
 VALUES ('On Mars', '14', 1, 2);
 INSERT INTO game(title, age, category_id, author_id)
