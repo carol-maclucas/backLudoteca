@@ -6,30 +6,6 @@ VALUES ('Ameritrash');
 INSERT INTO category(name)
 VALUES ('Familiar');
 
--- Client
-INSERT INTO client(name)
-VALUES ('Cliente 1');
-INSERT INTO client(name)
-VALUES ('Cliente 2');
-INSERT INTO client(name)
-VALUES ('Cliente 3');
-INSERT INTO client(name)
-VALUES ('Cliente 4');
-INSERT INTO client(name)
-VALUES ('Cliente 5');
-
--- Loans --
-INSERT INTO loan(game_id, client_id, start_date, end_date)
-VALUES (1, 1, '2020-01-01', '2020-01-06');
-INSERT INTO loan(game_id, client_id, start_date, end_date)
-VALUES(2, 1, '2020-01-02', '2020-01-14');
-INSERT INTO loan(game_id, client_id, start_date, end_date)
-VALUES (1, 1, '2020-01-07', '2020-01-14');
-INSERT INTO loan(game_id, client_id, start_date, end_date)
-VALUES(3, 2, '2020-01-01', '2020-01-09');
-INSERT INTO loan(game_id, client_id, start_date, end_date)
-VALUES(4, 3, '2020-01-01', '2020-01-10')
-
 -- Author
 INSERT INTO author(name, nationality)
 VALUES ('Alan R. Moon', 'US');
@@ -57,3 +33,30 @@ INSERT INTO game(title, age, category_id, author_id)
 VALUES ('Los viajes de Marco Polo', '12', 1, 3);
 INSERT INTO game(title, age, category_id, author_id)
 VALUES ('Azul', '8', 3, 5);
+
+-- Client
+INSERT INTO client(name)
+VALUES ('Cliente 1');
+INSERT INTO client(name)
+VALUES ('Cliente 2');
+INSERT INTO client(name)
+VALUES ('Cliente 3');
+INSERT INTO client(name)
+VALUES ('Cliente 4');
+INSERT INTO client(name)
+VALUES ('Cliente 5');
+
+
+-- Loans --
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (1, 1, '2020-01-01', '2020-01-06');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (2, 1, '2020-01-02', '2020-01-14');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (1, 1, '2020-01-07', '2020-01-14');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (3, 2, '2020-01-01', '2020-01-09');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (4, 3, '2020-01-01', '2020-01-10');
+INSERT INTO loan(game_id, client_id, start_date, end_date)
+VALUES (5, 4, '2020-01-07', '2020-01-15');

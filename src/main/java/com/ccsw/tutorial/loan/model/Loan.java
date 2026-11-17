@@ -20,7 +20,7 @@ public class Loan {
     private Long id;
 
     @ManyToOne
-    @Column(name = "game_id", nullable = false)
+    @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
     @ManyToOne

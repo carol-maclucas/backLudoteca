@@ -25,16 +25,11 @@ public interface LoanRepository extends CrudRepository<Loan, Long> {
      * Método para recuperar Loans por el id de su Game
      * @return {@link Loan}
      */
-    List<Loan> findByGame(Long id);
+    List<Loan> findByGameId(Long id);
 
     /**
      * Método para recuperar Loans por el id de su Customer
      * @return {@link Loan}
      */
-    List<Loan> findByClient(Long id);
-    /*
-    // Sub-consultas de join
-    @Override
-    @EntityGraph(attributePaths = { "game", "client" })
-    List<Loan> findAll(Specification<Loan> spec);*/
+    List<Loan> findByClientId(Long id);
 }

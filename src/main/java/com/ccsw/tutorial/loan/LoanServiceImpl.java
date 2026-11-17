@@ -114,7 +114,7 @@ public class LoanServiceImpl implements LoanService {
         loan.setGame(game);
 
         // Además, un juego no puede estar prestado a dos clientes distintos un mismo día
-        List<Loan> loans = loanRepository.findByGame(dto.getGame().getId());
+        List<Loan> loans = loanRepository.findByGameId(dto.getGame().getId());
         for (Loan existingloan : loans) {
             if (id != null && existingloan.getId() == id) {
                 continue;
@@ -126,7 +126,7 @@ public class LoanServiceImpl implements LoanService {
         }
 
         // Y un cliente no pue tener más de un préstamo a la vez
-        List<Loan> clientLoans = loanRepository.findByClient(dto.getClient().getId());
+        List<Loan> clientLoans = loanRepository.findByClientId(dto.getClient().getId());
 
         int overlappingLoans = 0;
         for (Loan existingLoan : clientLoans) {
