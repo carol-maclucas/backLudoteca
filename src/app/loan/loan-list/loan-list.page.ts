@@ -18,6 +18,8 @@ import { Clients } from '../../clients/model/Clients';
 import { Game } from '../../game/model/Game';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { GameService } from '../../game/game';
+import { ClientsService } from '../../clients/clients';
 
 
 @Component({
@@ -49,19 +51,29 @@ export class LoanListPage implements OnInit {
 
   protected readonly loanService = inject(LoanService);
   protected readonly dialog = inject(MatDialog)
+  protected readonly gameService = inject(GameService);
+  protected readonly clientsService = inject(ClientsService);
 
   //Inyección
-  protected readonly loans = signal<Loan[]>([]);
   protected readonly games = signal<Game[]>([]);
-  protected readonly client = signal<Clients[]>([]);
+  protected readonly clients = signal<Clients[]>([]);
 
   // Variables de filtro
-  protected readonly filterTitle = signal<string>('');
-  protected readonly filterClient = signal<string>('')  ;
+  protected readonly filterGameId = signal<number | null>(null);
+  protected readonly filterClientId = signal<number | null>(null);
   protected readonly filterDate = signal<Date | null>(null);
+  protected readonly filterError = signal<string | null>(null);
 
     // Al iniciar la página
     ngOnInit(): void {
+      this.gameService.getGames().subscribe({
+        next: (games) => this.games.set(games),
+        error: () => this.filterError.set('No se pudieron cargar las opciones de filtro.'),
+      });
+      this.clientsService.getClients().subscribe({
+        next: (clients) => this.clients.set(clients),
+        error: () => this.filterError.set('No se pudieron cargar las opciones de filtro.'),
+      });
       this.loadPage();
 
     }
@@ -84,11 +96,11 @@ export class LoanListPage implements OnInit {
           pageable.pageNumber = event.pageIndex;
       }
       //Filtrado
-      const title = this.filterTitle();
-      const client = this.filterClient();
+      const gameId = this.filterGameId() ?? undefined;
+      const clientId = this.filterClientId() ?? undefined;
       const date = this.filterDate();
 
-      this.loanService.getLoans(pageable, title, client, date)
+      this.loanService.getLoans(pageable, gameId, clientId, date)
       .subscribe((data) => {
           this.dataSource.data = data.content;
           this.pageNumber = data.pageable.pageNumber;
@@ -97,19 +109,15 @@ export class LoanListPage implements OnInit {
       });
     
     }
-    // Cambiar fecha de filtro
-    onDateChange(value: string): void {
-      this.filterDate.set(value ? new Date(value) : null);
-    }
-    // Buscar juegos según los filtros de título y categoría
+    // Buscar préstamos según los filtros seleccionados
     onSearch(): void {
       this.pageNumber = 0;
       this.loadPage();
     }
     // Limpiar los filtros y realizar la búsqueda
     onCleanFilter(): void {
-      this.filterTitle.set('');
-      this.filterClient.set('');
+      this.filterGameId.set(null);
+      this.filterClientId.set(null);
       this.filterDate.set(null);
       this.onSearch();
     }

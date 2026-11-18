@@ -3,16 +3,24 @@
     <div class="filters">
         <form>
             <mat-form-field>
-                <mat-label>Título del juego</mat-label>
-                <input type="text" matInput placeholder="Título del juego..." [ngModel]="filterTitle()" name ="title">
+                <mat-label>Juego</mat-label>
+                <mat-select placeholder="Todos" [ngModel]="filterGameId()" (ngModelChange)="filterGameId.set($event)" name="gameId">
+                    @for (game of games(); track game.id) {
+                        <mat-option [value]="game.id">{{game.title}}</mat-option>
+                    }
+                </mat-select>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Cliente</mat-label>
-                <input type="text" matInput placeholder="Cliente..."  [ngModel]="filterClient()" name="client">
+                <mat-select placeholder="Todos" [ngModel]="filterClientId()" (ngModelChange)="filterClientId.set($event)" name="clientId">
+                    @for (client of clients(); track client.id) {
+                        <mat-option [value]="client.id">{{client.name}}</mat-option>
+                    }
+                </mat-select>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Fecha</mat-label>
-                <input matInput [matDatepicker]="picker" placeholder="Fecha..." [ngModel]="filterDate()" name="date">
+                <input matInput [matDatepicker]="picker" placeholder="Fecha..." [ngModel]="filterDate()" (ngModelChange)="filterDate.set($event)" name="date">
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
@@ -21,6 +29,9 @@
             <button mat-stroked-button (click)="onSearch()">Filtrar</button>
         </div>
         </form>
+        @if (filterError()) {
+            <p class="filter-error">{{filterError()}}</p>
+        }
     </div>
     <mat-table [dataSource]="dataSource"> 
         <ng-container matColumnDef="id"> <!-- definimos la columna1 Id-->

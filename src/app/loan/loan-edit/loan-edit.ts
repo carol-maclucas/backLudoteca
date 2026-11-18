@@ -119,9 +119,15 @@ export class LoanEdit implements OnInit {
       endDate: this.endDate(),
     } as Loan;
       
-    this.loanService.saveLoan(loan).subscribe(() => {
-      this.dialogRef.close(true);
-      });
+    this.loanService.saveLoan(loan).subscribe({
+      next: () => this.dialogRef.close(true),
+      error: (error) => {
+        const detail = typeof error.error === 'string' ? error.error : error.error?.message ?? '';
+        this.errorMessage.set(error.status === 400 || error.status === 409 || error.status === 500 || /prestado/i.test(detail)
+          ? 'El juego ya está prestado en esas fechas escogidas.'
+          : 'No se pudo guardar el préstamo.');
+      },
+    });
     }
   
     onClose() {
