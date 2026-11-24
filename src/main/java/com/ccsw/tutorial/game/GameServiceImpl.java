@@ -9,7 +9,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class GameServiceImpl implements GameService {
         GameSpecification titleSpec = new GameSpecification(new SearchCriteria("title", ":", title));
         // Atributo de la categoria asociada -> Category (getPaths)
         GameSpecification categorySpec = new GameSpecification(new SearchCriteria("category.id", ":", idCategory));
-        
+
         Specification<Game> spec = titleSpec.and(categorySpec);
 
         return this.gameRepository.findAll(spec);
@@ -57,7 +59,7 @@ public class GameServiceImpl implements GameService {
         } else {
             game = this.gameRepository.findById(id).orElse(null);
             if (game == null) {
-                throw new RuntimeException("Game with id " + id + " not found");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
             }
         }
         // Para copiar más de un dato de una clase a otra

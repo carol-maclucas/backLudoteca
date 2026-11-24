@@ -2,9 +2,13 @@ package com.ccsw.tutorial.client;
 
 import com.ccsw.tutorial.client.model.Client;
 import com.ccsw.tutorial.client.model.ClientDto;
+import com.ccsw.tutorial.loan.LoanRepository;
+import com.ccsw.tutorial.loan.model.Loan;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -13,6 +17,9 @@ import java.util.List;
 public class ClientServiceImpl implements ClientService {
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private LoanRepository loanRepository;
 
     /**
      * {@inheritDoc}
@@ -50,7 +57,7 @@ public class ClientServiceImpl implements ClientService {
             client = this.get(id);
 
             if (client == null) {
-                throw new RuntimeException("Client not found");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found");
             }
         }
         Client existedClient = this.clientRepository.findByName(dto.getName());
@@ -59,7 +66,7 @@ public class ClientServiceImpl implements ClientService {
             // Si le cambio el nombre a un cliente con uno que ya existe en la BBDD
             // porque Id:3 Clara != Id:8 Clara
             if (id == null || !existedClient.getId().equals(id)) {
-                throw new RuntimeException("Client already exists");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Client already exists");
             }
         }
         client.setName(dto.getName());
@@ -72,7 +79,12 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void delete(Long id) throws Exception {
         if (this.get(id) == null) {
-            throw new Exception("Category not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found");
+        }
+        List<Loan> loans = this.loanRepository.findByClientId(id);
+
+        if (!loans.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar un cliente con préstamos activos");
         }
         this.clientRepository.deleteById(id);
     }

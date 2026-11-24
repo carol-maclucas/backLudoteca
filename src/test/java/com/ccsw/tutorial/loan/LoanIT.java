@@ -235,7 +235,7 @@ public class LoanIT {
 
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + deleteLoanId, HttpMethod.DELETE, null, Void.class);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     // ------------- PROBAR ERRORES -------------
@@ -270,7 +270,7 @@ public class LoanIT {
         dto.setEndDate(LocalDate.of(2020, 1, 25));
 
         ResponseEntity<String> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), String.class);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     // Cuando un Juego ya está prestado
@@ -292,7 +292,7 @@ public class LoanIT {
 
         ResponseEntity<String> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), String.class);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 
     // El cliente tiene más de 2 préstamos durante esas fechas
@@ -314,6 +314,48 @@ public class LoanIT {
 
         ResponseEntity<String> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), String.class);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+    }
+
+    // Comprobar creación si no existe el juego
+    @Test
+    public void saveWithNotExistingGameShouldFail() {
+        LoanDto dto = new LoanDto();
+
+        GameDto gameDto = new GameDto();
+        gameDto.setId(67L);
+
+        ClientDto clientDto = new ClientDto();
+        clientDto.setId(1L);
+
+        dto.setGame(gameDto);
+        dto.setClient(clientDto);
+        dto.setStartDate(LocalDate.of(2020, 1, 15));
+        dto.setEndDate(LocalDate.of(2020, 1, 20));
+
+        ResponseEntity<String> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), String.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    // Comprobar creación si no existe el cliente
+    @Test
+    public void saveWithNotExistingClientShouldFail() {
+        LoanDto dto = new LoanDto();
+
+        GameDto gameDto = new GameDto();
+        gameDto.setId(1L);
+
+        ClientDto clientDto = new ClientDto();
+        clientDto.setId(67L);
+
+        dto.setGame(gameDto);
+        dto.setClient(clientDto);
+        dto.setStartDate(LocalDate.of(2020, 1, 15));
+        dto.setEndDate(LocalDate.of(2020, 1, 20));
+
+        ResponseEntity<String> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), String.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }

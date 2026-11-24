@@ -7,7 +7,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -62,7 +64,7 @@ public class AuthorServiceImpl implements AuthorService {
             author = this.get(id);
 
             if (author == null) {
-                throw new RuntimeException("Author not found");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found");
             }
         }
         // BeanUtils:- Para copiar más de un dato de una clase a otra
@@ -77,11 +79,9 @@ public class AuthorServiceImpl implements AuthorService {
      */
     @Override
     public void delete(Long id) throws Exception {
-
         if (this.get(id) == null) {
-            throw new Exception("Not exists");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found");
         }
-
         this.authorRepository.deleteById(id);
     }
 }

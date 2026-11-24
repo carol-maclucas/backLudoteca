@@ -140,18 +140,16 @@ public class AuthorIT {
         assertEquals(NEW_NATIONALITY, author.getNationality());
     }
 
-    // Sin id existente -> Excepción
+    // Sin id existente
     @Test
     public void modifyWithNotExistIdShouldThrowException() {
-
         long authorId = TOTAL_AUTHORS + 1;
 
         AuthorDto dto = new AuthorDto();
         dto.setName(NEW_AUTHOR_NAME);
 
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + authorId, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     //------------- ELIMINACIÓN de AUTORES ------------
@@ -172,15 +170,13 @@ public class AuthorIT {
         assertEquals(newAuthorsSize, response.getBody().getTotalElements());
     }
 
-    // Sin id existente -> Excepción
+    // Sin id existente
     @Test
     public void deleteWithNotExistsIdShouldThrowException() {
-
         long deleteAuthorId = TOTAL_AUTHORS + 1;
 
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + deleteAuthorId, HttpMethod.DELETE, null, Void.class);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
 }

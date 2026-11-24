@@ -13,7 +13,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -33,6 +35,9 @@ public class LoanServiceImpl implements LoanService {
 
     @Autowired
     ClientRepository clientRepository;
+
+    private static final int MAX_LOAN_DAYS = 14;
+    private static final int MAX_LOAN_PER_CLIENT = 2;
 
     /**
      * {@inheritDoc}
@@ -89,59 +94,53 @@ public class LoanServiceImpl implements LoanService {
         }
 
         if (loan == null) {
-            throw new RuntimeException("Loan does not exist");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan does not exist");
         }
         // BeanUtils:- Para copiar más de un dato de una clase a otra
         BeanUtils.copyProperties(dto, loan, "id", "game", "client");
 
         if (dto.getStartDate() == null || dto.getEndDate() == null || dto.getStartDate().isAfter(dto.getEndDate())) {
-            throw new RuntimeException("El rango de fechas del préstamo no es válido.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rango de fechas del préstamo no es válido.");
         }
 
         // Miramos si el rango de fechas es correcto (máximo 14 días + fecha de inicio > fecha de devolución)
         long diffDays = ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate());
-        if (diffDays > 14) {
-            throw new RuntimeException("El préstamo no puede superar los 14 días");
+        if (diffDays > MAX_LOAN_DAYS) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El préstamo no puede superar los 14 días");
         }
         loan.setStartDate(dto.getStartDate());
         loan.setEndDate(dto.getEndDate());
 
-        // Guardamos el cliente y el juego con el préstamo
-        Client client = this.clientRepository.findById(dto.getClient().getId()).orElse(null);
-        Game game = this.gameRepository.findById(dto.getGame().getId()).orElse(null);
+        // -------------------------------------------------------------
+        // Validamos el cliente y el juego
+        if (dto.getClient() == null || dto.getClient().getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cliente es obligatorio");
+        }
 
+        if (dto.getGame() == null || dto.getGame().getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El juego es obligatorio");
+        }
+
+        // Guardamos el cliente y el juego con el préstamo
+        Client client = this.clientRepository.findById(dto.getClient().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+        Game game = this.gameRepository.findById(dto.getGame().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
         loan.setClient(client);
         loan.setGame(game);
+        // ------------------------------------------------------------
 
-        // Además, un juego no puede estar prestado a dos clientes distintos un mismo día
-        List<Loan> loans = loanRepository.findByGameId(dto.getGame().getId());
-        for (Loan existingloan : loans) {
-            if (id != null && existingloan.getId() == id) {
-                continue;
-            }
-            boolean overlap = !dto.getEndDate().isBefore(existingloan.getStartDate()) && !dto.getStartDate().isAfter(existingloan.getEndDate());
-            if (overlap) {
-                throw new RuntimeException("El juego ya está prestado en esas fechas escogidas");
-            }
+        // Además, un JUEGO no puede estar prestado a dos clientes distintos un mismo día
+        long overlapCount = loanRepository.countOverlappingGameLoans(dto.getGame().getId(), id == null ? -1L : id, dto.getStartDate(), dto.getEndDate());
+
+        if (overlapCount > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El juego ya está prestado en esas fechas escogidas");
         }
 
-        // Y un cliente no pue tener más de un préstamo a la vez
-        List<Loan> clientLoans = loanRepository.findByClientId(dto.getClient().getId());
+        // Y un CLIENTE no pue tener más de un préstamo a la vez
+        long overlappingLoans = loanRepository.countOverlappingClientLoans(dto.getClient().getId(), id == null ? -1L : id, dto.getStartDate(), dto.getEndDate());
 
-        int overlappingLoans = 0;
-        for (Loan existingLoan : clientLoans) {
-            if (id != null && existingLoan.getId() == id) {
-                continue;
-            }
-            boolean overlap = !dto.getEndDate().isBefore(existingLoan.getStartDate()) && !dto.getStartDate().isAfter(existingLoan.getEndDate());
-            if (overlap) {
-                overlappingLoans++;
-            }
+        if (overlappingLoans >= MAX_LOAN_PER_CLIENT) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El cliente ya tiene dos préstamos simultáneos");
         }
-        if (overlappingLoans >= 2) {
-            throw new RuntimeException("El cliente ya tiene dos préstamos simultáneos");
-        }
-
         this.loanRepository.save(loan);
     }
 
@@ -151,7 +150,7 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public void delete(Long id) throws Exception {
         if (this.get(id) == null) {
-            throw new RuntimeException("Loan no existe");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan does not exist");
         }
         this.loanRepository.deleteById(id);
     }

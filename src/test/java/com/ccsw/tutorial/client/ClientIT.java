@@ -49,6 +49,7 @@ public class ClientIT {
 
     //-------------- CREACIÓN de CLIENTES ------------
     public static final Long NEW_CLIENT_ID = 6L;
+    public static final Long NEW_CLIENT_ID_2 = 1L;
     public static final String NEW_CLIENT_NAME = "Cliente_6";
 
     @Test
@@ -67,7 +68,6 @@ public class ClientIT {
     }
 
     // -- Evitando nombres duplicados --
-    public static final Long SECOND_CLIENT_ID = 9L;
     public static final String DUPLICATED_NAME = "Cliente 2";
 
     @Test
@@ -108,7 +108,7 @@ public class ClientIT {
         dto.setName(NEW_CLIENT_NAME);
         // PUT
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + NEW_CLIENT_ID, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     //Modificando un NOMBRE que ya existe
@@ -117,12 +117,12 @@ public class ClientIT {
         ClientDto dto = new ClientDto();
         dto.setName(DUPLICATED_NAME);
         // PUT
-        ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + NEW_CLIENT_ID, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + NEW_CLIENT_ID_2, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
     }
 
     //-------------- ELIMINACIÓN de CLIENTE ------------
-    public static final Long DELETE_CLIENT_ID = 2L;
+    public static final Long DELETE_CLIENT_ID = 5L;
 
     // Eliminación y comprobación del tamaño
     @Test
@@ -140,6 +140,6 @@ public class ClientIT {
     public void deleteWithNotExistsIdShouldInternalError() {
         // DELETE
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + "/" + NEW_CLIENT_ID, HttpMethod.DELETE, null, Void.class);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }
