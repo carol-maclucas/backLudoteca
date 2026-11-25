@@ -99,7 +99,7 @@ public class LoanServiceImpl implements LoanService {
         // BeanUtils:- Para copiar más de un dato de una clase a otra
         BeanUtils.copyProperties(dto, loan, "id", "game", "client");
 
-        if (dto.getStartDate() == null || dto.getEndDate() == null || dto.getStartDate().isAfter(dto.getEndDate())) {
+        if (dto.getStartDate() == null || dto.getEndDate() == null || !dto.getEndDate().isAfter(dto.getStartDate())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rango de fechas del préstamo no es válido.");
         }
 

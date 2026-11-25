@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -81,11 +82,19 @@ public class ClientServiceImpl implements ClientService {
         if (this.get(id) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found");
         }
+        // Comprobar si tiene un préstamo ACTUAL
         List<Loan> loans = this.loanRepository.findByClientId(id);
+        LocalDate today = LocalDate.now();
 
-        if (!loans.isEmpty()) {
+        boolean activeLoan = loans.stream().anyMatch(loan -> !today.isBefore(loan.getStartDate()) && !today.isAfter(loan.getEndDate()));
+
+        // Si tiene préstamos activos no podemos eliminar el cliente
+        if (activeLoan) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede eliminar un cliente con préstamos activos");
         }
+        // Borramos sus préstamos históricos NO ACTUALES
+        loanRepository.deleteAll(loans);
+
         this.clientRepository.deleteById(id);
     }
 }
